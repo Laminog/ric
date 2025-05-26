@@ -1,0 +1,108 @@
+
+useradd user -u 1010 -U 
+passwd 
+usermod –aG sudo 
+visudo
+sshuser ALL=NOPASSWD: ALL
+net_admin ALL=(ALL) NOPASSWD: ALL 
+
+systemctl enable --now openvswitch-switch
+ovs-vsctl add-br hq-sw
+ovs-vsctl add-port hq-sw ens4 tag=100
+ovs-vsctl add-port hq-sw vlan100 tag=100 -- set interface vlan100 type=internal
+systemctl restart openvswitch-switch-
+systemctl restart NetworkManager
+ip link set hq-sw up
+ip a add ip dev vlan100
+ip link set vlan100 up
+ip -c -br a
+
+apt install policycoreutils selinux-policy-default selinux-basics
+selinux-activate
+reboot
+sestatus
+semanage port -a -t ssh_port_t -p tcp 2024
+setenforce 0
+apt install openssh-server
+nano /etc/ssh/sshd_config
+#Port 22
+Port 2024
+AllowUsers sshuser
+#MaxAuthTries 6
+MaxAuthTries 2
+#Banner none
+Banner /etc/ssh-banner 
+nano /etc/ssh-banner
+systemctl restart sshd
+ssh sshuser@192.168.100.2 –p 2024
+
+nmcli connection modify tun1 ip-tunnel.ttl 64
+
+apt install frr
+nano /etc/frr/daemons
+ospfd = yes
+systemctl enable --now frr
+systemctl restart frr
+vtysh
+hq-rtr.au-team.irpo# configure terminal
+hq-rtr.au-team.irpo(config)# router ospf
+hq-rtr.au-team.irpo(config)# router-id 1.1.1.1
+hq-rtr.au-team.irpo(config-router)# passive-interface default
+hq-rtr.au-team.irpo(config-router)# network 192.168.100.0/26 area 0
+hq-rtr.au-team.irpo(config-router)# network 192.168.100.64/28 area 0
+hq-rtr.au-team.irpo(config-router)# network 10.10.0.0/30 area 0
+area 0 authentication
+hq-rtr.au-team.irpo(config-if)# no passive-interface tun1tterface tun1
+hq-rtr.au-team.irpo(config-router)# exit
+hq-rtr.au-team.irpo(config)# interface tun1
+hq-rtr.au-team.irpo(config-if)# no ip ospf network broadcast
+ip ospf authentication
+ip ospf authentication-key password
+hq-rtr.au-team.irpo(config-if)# exit
+hq-rtr.au-team.irpo(config)# exit
+hq-rtr.au-team.irpo# write
+hq-rtr.au-team.irpo# exit
+:systemctl restart frr
+
+apt install frr
+nano /etc/frr/daemons
+ospfd = yes
+systemctl enable --now frr
+systemctl restart frr
+vtysh
+br-rtr.au-team.irpo# configure terminal
+br-rtr.au-team.irpo(config)# router ospf
+br-rtr.au-team.irpo(config)# router-id 2.2.2.2
+br-rtr.au-team.irpo(config-router)# passive-interface default
+br-rtr.au-team.irpo(config-router)# network 192.168.200.0/27 area 0
+br-rtr.au-team.irpo(config-router)# network 10.10.0.0/30 area 0
+area 0 authentication
+br-rtr.au-team.irpo(config-if)# no passive-interface tun1tterface tun1
+br-rtr.au-team.irpo(config-router)# exit
+br-rtr.au-team.irpo(config)# interface tun1
+br-rtr.au-team.irpo(config-if)# no ip ospf network broadcast
+ip ospf authentication
+ip ospf authentication-key password
+br-rtr.au-team.irpo(config-if)# exit
+br-rtr.au-team.irpo(config)# exit
+br-rtr.au-team.irpo# write
+br-rtr.au-team.irpo# exit
+systemctl restart frr
+vtysh
+show running-config
+
+apt install isc-dhcp-server
+nano /etc/default/isc-dhcp-server
+INTERFACESv4=”vlan200”
+nano /etc/dhcp/dhcpd.conf
+
+option fomain-name "au-team.irpo"
+option fomain-name "192.168.100.2"
+
+subnet 192.168.100.64 netmask 255.255.255.240 {
+  range 192.168.100.66 192.168.100.78;
+  option routers 192,168.100.65;
+}
+systemctl enable --now isc-dhcp-server
+systemctl restart isc-dhcp-server
+systemctl status isc-dhcp-server
