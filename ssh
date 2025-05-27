@@ -1,0 +1,18 @@
+apt install policycoreutils selinux-policy-default selinux-basics
+selinux-activate
+reboot
+sestatus
+semanage port -a -t ssh_port_t -p tcp 2024
+setenforce 0
+ apt install openssh-server
+nano /etc/ssh/sshd_config
+#Port 22
+Port 2024
+AllowUsers sshuser
+#MaxAuthTries 6
+MaxAuthTries 2
+#Banner none
+Banner /etc/ssh-banner 
+nano /etc/ssh-banner
+systemctl restart sshd
+ssh sshuser@192.168.100.2 –p 2024
