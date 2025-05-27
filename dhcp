@@ -1,0 +1,15 @@
+apt install isc-dhcp-server
+nano /etc/default/isc-dhcp-server
+INTERFACESv4=”vlan200”
+nano /etc/dhcp/dhcpd.conf
+
+option fomain-name "au-team.irpo"
+option fomain-name "192.168.100.2"
+
+subnet 192.168.100.64 netmask 255.255.255.240 {
+  range 192.168.100.66 192.168.100.78;
+  option routers 192,168.100.65;
+}
+systemctl enable --now isc-dhcp-server
+systemctl restart isc-dhcp-server
+systemctl status isc-dhcp-server
