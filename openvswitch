@@ -1,0 +1,12 @@
+apt-get update
+apt-get install openvswitch-switch
+systemctl enable --now openvswitch-switch
+ovs-vsctl add-br hq-sw
+ovs-vsctl add-port hq-sw ens4 tag=100
+ovs-vsctl add-port hq-sw vlan100 tag=100 -- set interface vlan100 type=internal
+systemctl restart openvswitch-switch-
+systemctl restart NetworkManager
+ip link set hq-sw up
+ip a add 192.168.100.1/26 dev vlan100
+ip link set vlan100 up
+ip -c -br a
