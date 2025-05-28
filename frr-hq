@@ -1,1 +1,25 @@
-
+apt install frr
+nano /etc/frr/daemons
+ospfd = yes
+systemctl enable --now frr
+systemctl restart frr
+vtysh
+hq-rtr.au-team.irpo# configure terminal
+hq-rtr.au-team.irpo(config)# router ospf
+hq-rtr.au-team.irpo(config)# router-id 1.1.1.1
+hq-rtr.au-team.irpo(config-router)# passive-interface default
+hq-rtr.au-team.irpo(config-router)# network 192.168.100.0/26 area 0
+hq-rtr.au-team.irpo(config-router)# network 192.168.100.64/28 area 0
+hq-rtr.au-team.irpo(config-router)# network 10.10.0.0/30 area 0
+area 0 authentication
+hq-rtr.au-team.irpo(config-if)# no passive-interface tun1tterface tun1
+hq-rtr.au-team.irpo(config-router)# exit
+hq-rtr.au-team.irpo(config)# interface tun1
+hq-rtr.au-team.irpo(config-if)# no ip ospf network broadcast
+ip ospf authentication
+ip ospf authentication-key password
+hq-rtr.au-team.irpo(config-if)# exit
+hq-rtr.au-team.irpo(config)# exit
+hq-rtr.au-team.irpo# write
+hq-rtr.au-team.irpo# exit
+:systemctl restart frr
