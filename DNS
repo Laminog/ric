@@ -1,0 +1,14 @@
+ apt install bind9
+ nano /etc/bind/named.conf.option
+
+allow-query { any; };
+forwarders {
+        8.8.8.8;
+};
+
+listen-on-v6 port 53 { none; };
+listen-on port 53 { 127.0.0.1; 192.168.100.0/26; 192.168.100.64/28; 192.168.200.0/27; }
+
+};
+
+ nano /etc/bind/named.conf.local
