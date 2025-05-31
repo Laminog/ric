@@ -33,13 +33,12 @@ ip link set vlan200 up
 ip link set vlan999 up
 ip -c -br a
 
-apt install policycoreutils selinux-policy-default selinux-basics
+apt install selinux-basics
 selinux-activate
 reboot
 sestatus
 semanage port -a -t ssh_port_t -p tcp 2024
 setenforce 0
- apt install openssh-server
 nano /etc/ssh/sshd_config
 #Port 22
 Port 2024
@@ -61,15 +60,15 @@ ospfd = yes
 systemctl enable --now frr
 systemctl restart frr
 vtysh
-hq-rtr.au-team.irpo# configure terminal
+hq-rtr.au-team.irpo# config
 hq-rtr.au-team.irpo(config)# router ospf
-hq-rtr.au-team.irpo(config)# router-id 1.1.1.1
+hq-rtr.au-team.irpo(config-router)# router-id 1.1.1.1
 hq-rtr.au-team.irpo(config-router)# passive-interface default
 hq-rtr.au-team.irpo(config-router)# network 192.168.100.0/26 area 0
 hq-rtr.au-team.irpo(config-router)# network 192.168.100.64/28 area 0
 hq-rtr.au-team.irpo(config-router)# network 10.10.0.0/30 area 0
 area 0 authentication
-hq-rtr.au-team.irpo(config-if)# no passive-interface tun1tterface tun1
+hq-rtr.au-team.irpo(config-if)# no passive-interface tun1
 hq-rtr.au-team.irpo(config-router)# exit
 hq-rtr.au-team.irpo(config)# interface tun1
 hq-rtr.au-team.irpo(config-if)# no ip ospf network broadcast
@@ -79,7 +78,9 @@ hq-rtr.au-team.irpo(config-if)# exit
 hq-rtr.au-team.irpo(config)# exit
 hq-rtr.au-team.irpo# write
 hq-rtr.au-team.irpo# exit
-:systemctl restart frr
+systemctl restart frr
+vtysh
+show running-config
 
 apt install frr
 nano /etc/frr/daemons
@@ -87,14 +88,14 @@ ospfd = yes
 systemctl enable --now frr
 systemctl restart frr
 vtysh
-br-rtr.au-team.irpo# configure terminal
+br-rtr.au-team.irpo# config
 br-rtr.au-team.irpo(config)# router ospf
-br-rtr.au-team.irpo(config)# router-id 2.2.2.2
+br-rtr.au-team.irpo(config-router)# router-id 2.2.2.2
 br-rtr.au-team.irpo(config-router)# passive-interface default
 br-rtr.au-team.irpo(config-router)# network 192.168.200.0/27 area 0
 br-rtr.au-team.irpo(config-router)# network 10.10.0.0/30 area 0
 area 0 authentication
-br-rtr.au-team.irpo(config-if)# no passive-interface tun1tterface tun1
+br-rtr.au-team.irpo(config-if)# no passive-interface tun1
 br-rtr.au-team.irpo(config-router)# exit
 br-rtr.au-team.irpo(config)# interface tun1
 br-rtr.au-team.irpo(config-if)# no ip ospf network broadcast
