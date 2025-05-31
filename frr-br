@@ -4,14 +4,14 @@ ospfd = yes
 systemctl enable --now frr
 systemctl restart frr
 vtysh
-br-rtr.au-team.irpo# configure terminal
+br-rtr.au-team.irpo# config
 br-rtr.au-team.irpo(config)# router ospf
-br-rtr.au-team.irpo(config)# router-id 2.2.2.2
+br-rtr.au-team.irpo(config-router)# router-id 2.2.2.2
 br-rtr.au-team.irpo(config-router)# passive-interface default
 br-rtr.au-team.irpo(config-router)# network 192.168.200.0/27 area 0
 br-rtr.au-team.irpo(config-router)# network 10.10.0.0/30 area 0
 area 0 authentication
-br-rtr.au-team.irpo(config-if)# no passive-interface tun1tterface tun1
+br-rtr.au-team.irpo(config-if)# no passive-interface tun1
 br-rtr.au-team.irpo(config-router)# exit
 br-rtr.au-team.irpo(config)# interface tun1
 br-rtr.au-team.irpo(config-if)# no ip ospf network broadcast
