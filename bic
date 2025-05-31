@@ -8,6 +8,7 @@ useradd net_admin -U
 passwd net_admin
 P@$$word 
 usermod –aG sudo net_admin
+visudo
 net_admin ALL=(ALL) NOPASSWD: ALL 
 
 apt install isc-dhcp-server
