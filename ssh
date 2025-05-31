@@ -4,7 +4,6 @@ reboot
 sestatus
 semanage port -a -t ssh_port_t -p tcp 2024
 setenforce 0
- apt install openssh-server
 nano /etc/ssh/sshd_config
 #Port 22
 Port 2024
