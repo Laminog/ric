@@ -1,1 +1,12 @@
-
+useradd sshuser -u 1010 -U 
+passwd sshuser
+P@ssw0rd
+usermod –aG sudo sshuser
+visudo
+sshuser ALL=NOPASSWD: ALL
+useradd net_admin -U
+passwd net_admin
+P@$$word 
+usermod –aG sudo net_admin
+visudo
+net_admin ALL=(ALL) NOPASSWD: ALL 
