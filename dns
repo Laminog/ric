@@ -1,5 +1,5 @@
  apt install bind9
- nano /etc/bind/named.conf.option
+ nano /etc/bind/named.conf.options
 
 allow-query { any; };
 forwarders {
